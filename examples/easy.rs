@@ -9,10 +9,6 @@ use annotate_snippets::snippet::{Annotation, AnnotationType, Slice, Snippet, Sou
 // - optional help text
 //
 // ```rust
-// let msg = thingy::error("expected type, found `22`")
-//     .error(0, 18, "and here's an error".to_string())
-//     .help("try using a foobs intead".to_string());
-//
 // Error::new("expected type, found `x`)
 //     .error(260, 0, 18, msg, "and here's an error")
 //     .help("try using a foobs intead".to_string());
@@ -20,22 +16,17 @@ use annotate_snippets::snippet::{Annotation, AnnotationType, Slice, Snippet, Sou
 // Waring::new("expected type, found `x`)
 //     .warning(260, 0, 18, msg, "and here's a warning")
 //     .help("try using a foobs intead".to_string());
-//
-// let msg = Message::new("expected type, found `22`")
-//     .push(Slice::new(80
-//     .error(0, 18, "and here's an error".to_string())
-//     .help("try using a foobs intead".to_string());
 // ```
 
-struct Message {
-    line_start: usize,
+/// An error formatter.
+pub struct Error {
     snippet: Snippet,
 }
 
-impl Message {
-    pub fn new(line_start: usize, label: String) -> Self {
+impl Error {
+    /// Create a new `Error` formatter.
+    pub fn new(label: String) -> Self {
         Self {
-            line_start,
             snippet: Snippet {
                 title: Some(Annotation {
                     label: Some(label),
@@ -48,23 +39,33 @@ impl Message {
         }
     }
 
-    pub fn error(self, start: usize, end: usize, line_start: usize, source: String) -> Self {
+    /// Pass a new error to the formatter.
+    pub fn error(
+        mut self,
+        start: usize,
+        end: usize,
+        line_start: usize,
+        source: String,
+        label: String,
+    ) -> Self {
         self.snippet.slices.push(Slice {
-            source: r#"This is an example
-content of the slice
-which will be annotated
-with the list of annotations below.
-                "#
-            .to_string(),
-            line_start: 260,
+            source,
+            line_start,
             origin: None,
             fold: true,
             annotations: vec![SourceAnnotation {
-                label: "and here's a warning".to_string(),
+                label,
                 annotation_type: AnnotationType::Error,
-                range: (3, 30),
+                range: (start, end),
             }],
-        })
+        });
+        self
+    }
+
+    pub fn to_string(self)  -> String {
+        let dl = DisplayList::from(self.snippet);
+        let dlf = DisplayListFormatter::new(true, false);
+        format!("{}", dlf.format(&dl))
     }
 }
 
