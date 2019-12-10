@@ -1,0 +1,17 @@
+[package]
+name = "playground-annotate-snippets"
+version = "1.0.0"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/yoshuawuyts/playground-annotate-snippets"
+documentation = "https://docs.rs/playground-annotate-snippets"
+description = "annotate snippets."
+keywords = []
+categories = []
+authors = ["Yoshua Wuyts <yoshuawuyts@gmail.com>"]
+readme = "README.md"
+edition = "2018"
+
+[dependencies]
+annotate-snippets = "0.6.1"
+
+[dev-dependencies]
